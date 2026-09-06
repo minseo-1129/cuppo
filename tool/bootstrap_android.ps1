@@ -6,9 +6,9 @@ if (-not (Get-Command flutter -ErrorAction SilentlyContinue)) {
   throw "Flutter가 설치되어 있지 않습니다. Flutter SDK 설치 후 다시 실행하세요."
 }
 
-$AssetParts = Join-Path $Root "tool\assets_bundle"
-if (-not (Test-Path $AssetParts)) { throw "tool/assets_bundle 이 없습니다." }
-python -c "import base64,io,pathlib,zipfile; p=pathlib.Path(r'$AssetParts'); parts=sorted(p.glob('part_*.b64')); data=base64.b64decode(''.join(x.read_text(encoding='ascii') for x in parts)); zipfile.ZipFile(io.BytesIO(data)).extractall(r'$Root')"
+$AssetZip = Join-Path $Root "tool\assets_bundle\assets.zip"
+if (-not (Test-Path $AssetZip)) { throw "tool/assets_bundle/assets.zip 이 없습니다." }
+python -c "import pathlib,zipfile; zipfile.ZipFile(pathlib.Path(r'$AssetZip')).extractall(r'$Root')"
 
 New-Item -ItemType Directory -Path $Temp | Out-Null
 try {

@@ -9,17 +9,18 @@ if ! command -v flutter >/dev/null 2>&1; then
   exit 1
 fi
 
+ASSET_ZIP="$ROOT/tool/assets_bundle/assets.zip"
+if [[ ! -f "$ASSET_ZIP" ]]; then
+  echo "tool/assets_bundle/assets.zip 이 없습니다."
+  exit 1
+fi
+
 python3 - <<PYASSETS
 from pathlib import Path
 from zipfile import ZipFile
-from io import BytesIO
-import base64
 root = Path(r"$ROOT")
-parts = sorted((root / "tool" / "assets_bundle").glob("part_*.b64"))
-if not parts:
-    raise SystemExit("tool/assets_bundle/part_*.b64 이 없습니다.")
-data = base64.b64decode("".join(p.read_text(encoding="ascii") for p in parts))
-with ZipFile(BytesIO(data)) as z:
+bundle = root / "tool" / "assets_bundle" / "assets.zip"
+with ZipFile(bundle) as z:
     z.extractall(root)
 PYASSETS
 
