@@ -4,9 +4,9 @@ import 'package:cuppo/models/coffee_record.dart';
 
 void main() {
   test('illustration path follows decoration rule', () {
-    expect(illustrationPath(menu: 'latte', temp: 'hot', deco: 'whipper'), 'assets/ill/hotlatte_wip.webp');
-    expect(illustrationPath(menu: 'ame', temp: 'hot', deco: 'whipper'), 'assets/ill/hotame.webp');
-    expect(illustrationPath(menu: 'mocha', temp: 'ice', deco: 'icecube'), 'assets/ill/icemocha_ice.webp');
+    expect(illustrationPath(menu: 'latte', temp: 'hot', deco: 'whipper'), 'assets/ill/hotlatte_wip.png');
+    expect(illustrationPath(menu: 'ame', temp: 'hot', deco: 'whipper'), 'assets/ill/hotame.png');
+    expect(illustrationPath(menu: 'mocha', temp: 'ice', deco: 'icecube'), 'assets/ill/icemocha_ice.png');
   });
 
   test('record json round trip', () {
