@@ -13,3 +13,10 @@ android/key.properties
 *.jks
 *.keystore
 .DS_Store
+# Generated from tool/cuppo_assets.zip by bootstrap scripts.
+assets/*.webp
+assets/ill/*.webp
+assets/sel/*.webp
+platform_assets/android/mipmap-*/ic_launcher.png
+# Local reconstructed asset archive (if created manually).
+tool/cuppo_assets.zip
