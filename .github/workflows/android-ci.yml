@@ -31,7 +31,9 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
 
-      - name: Bootstrap Android project and assets
+      - name: Bootstrap Android project for CI
+        env:
+          CUPPO_SKIP_ASSETS: '1'
         run: ./tool/bootstrap_android.sh
 
       - name: Analyze
