@@ -39,6 +39,8 @@ flutter run
 - targetSdk / compileSdk: 36
 - 앱 이름: CUPPO
 
+런타임 이미지 번들은 `tool/assets_bundle/assets.zip`에 바이너리 ZIP으로 저장되어 CI와 로컬 부트스트랩에서 동일하게 사용됩니다.
+
 ## 검증
 
 ```bash
