@@ -43,12 +43,12 @@ String illustrationPath({
 }) {
   final base = temp == 'hot' ? 'assets/ill/hot$menu' : 'assets/ill/ice$menu';
   if (temp == 'hot' && deco == 'whipper' && menu != 'ame') {
-    return '${base}_wip.webp';
+    return '${base}_wip.png';
   }
   if (temp == 'ice' && deco == 'icecube') {
-    return '${base}_ice.webp';
+    return '${base}_ice.png';
   }
-  return '$base.webp';
+  return '$base.png';
 }
 
 String recordIllustration(CoffeeRecord record) => illustrationPath(
