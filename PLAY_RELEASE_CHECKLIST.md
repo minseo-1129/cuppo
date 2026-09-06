@@ -1,13 +1,16 @@
 # CUPPO Google Play 릴리즈 체크리스트
 
-## 현재 프로젝트 기본값
+## 현재 Play / 프로젝트 버전
 - 앱 표시 이름: `CUPPO`
 - Dart 프로젝트: `cuppo`
 - Android applicationId / package name: `com.cuppo.coffeejournal`
-- 앱 버전: `1.0.0+1`
+- Google Play 내부 테스트 최신 버전: versionCode `1` / versionName `1.0.0`
+- 다음 배포 예정 버전: versionCode `2` / versionName `0.2.0`
+- `pubspec.yaml`: `0.2.0+2`
 - Android targetSdk: `36` (bootstrap 후 패치)
-- 가격 권장: 무료
-- 스토어 기본 언어 권장: 한국어(대한민국)
+
+> Google Play 업데이트에서는 기존에 업로드된 값보다 큰 `versionCode`가 필요합니다.
+> 표시 버전인 `versionName`은 `0.2.0`으로 사용할 수 있으므로 이번 배포는 `0.2.0+2`로 진행합니다.
 
 ## 로컬 첫 실행
 Windows PowerShell:
@@ -23,44 +26,33 @@ flutter run
 ```
 
 ## Play용 AAB 전에 꼭 할 것
-1. Android Studio SDK Manager에서 Android API 36 SDK 설치
-2. 앱을 실제 기기에서 충분히 테스트
-3. 업로드 키(keystore)를 생성하고 Android release signing 설정
-4. `pubspec.yaml`의 버전/빌드 번호 확인
-5. `flutter clean && flutter pub get`
-6. `flutter build appbundle --release`
-7. 결과물: `build/app/outputs/bundle/release/app-release.aab`
+1. 앱을 실제 기기에서 충분히 테스트
+2. Play Console에 등록한 upload key(keystore)를 준비
+3. GitHub Repository Secrets에 아래 4개 값을 등록
+   - `ANDROID_KEYSTORE_BASE64`
+   - `ANDROID_KEY_ALIAS`
+   - `ANDROID_KEY_PASSWORD`
+   - `ANDROID_STORE_PASSWORD`
+4. `pubspec.yaml`이 `0.2.0+2`인지 확인
+5. GitHub Actions → **Android Release AAB** → Run workflow
+6. 성공 후 `cuppo-v0.2.0-build-2-aab` artifact에서 `app-release.aab` 다운로드
+7. Play Console 내부 테스트 트랙에 새 출시를 만들고 AAB 업로드
 
-> Flutter의 기본 생성 템플릿은 release 빌드에 debug signing을 임시로 사용할 수 있습니다.
-> Play 업로드 전에는 반드시 본인의 upload key로 release signing을 설정하세요.
+## GitHub Actions 배포 흐름
+배포 workflow는 다음 순서로 동작합니다.
+1. Flutter / Java / Android API 36 준비
+2. `ANDROID_KEYSTORE_BASE64`를 임시 keystore 파일로 복원
+3. Android 프로젝트 bootstrap
+4. release signing 설정 적용
+5. `flutter analyze`
+6. `flutter test`
+7. signed `flutter build appbundle --release`
+8. Play 업로드용 AAB artifact 저장
 
-## v1 포함 기능
-- 온보딩 3단계
-- 커피 기록 피드
-- 리스트 / 갤러리 보기
-- 메뉴 8종
-- 온도 / 우유 / 시럽 / 장식 레시피 설정
-- 제목 / 메모 입력
-- SharedPreferences 로컬 저장
-- 기록 상세 / 삭제
-- 월별 달력
-- 제목·메모 검색 및 메뉴 필터
-- 라이트 / 다크 모드
+> 업로드 키 파일과 비밀번호는 절대 Git에 커밋하지 않습니다.
 
-## v1.1 이후 권장
-- 카메라 촬영 / 배경 제거
-- 사진 저장 권한 및 사진 기반 카드
-- 공유 카드 이미지 export
-- 월간 취향 리포트
-- 카페인 흐름 차트
-- Android 홈 위젯
-- 백업 / 복원
-
-## GitHub Actions로 signed AAB 만들기
-1. upload keystore 생성
-2. GitHub Repository Secrets에 `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `ANDROID_STORE_PASSWORD` 등록
-3. Actions → **Android Release AAB** → Run workflow
-4. 성공 후 `cuppo-release-aab` artifact 다운로드
-5. Play Console 내부 테스트 트랙에 `app-release.aab` 업로드
-
-> 업로드 키/비밀번호는 절대 Git에 커밋하지 않습니다.
+## 배포 후 확인
+- Play Console에 표시되는 새 versionCode가 `2`인지 확인
+- 표시 버전이 `0.2.0`인지 확인
+- 내부 테스터 계정에서 업데이트 설치 확인
+- 주요 화면과 기록 저장/조회 동작 확인
