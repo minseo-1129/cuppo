@@ -2,6 +2,17 @@ name: Android Release AAB
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - release/v0.2
+    paths:
+      - .github/workflows/android-release.yml
+      - pubspec.yaml
+      - tool/patch_android.py
+      - tool/bootstrap_android.sh
+      - lib/**
+      - assets/**
+      - platform_assets/**
 
 jobs:
   build:
