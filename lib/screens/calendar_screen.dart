@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/menu_catalog.dart';
 import '../models/coffee_record.dart';
 import '../state/app_state.dart';
-import '../widgets/paper_scaffold.dart';
 import 'detail_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -26,14 +25,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ink = Theme.of(context).colorScheme.onSurface;
     final days = DateTime(month.year, month.month + 1, 0).day;
     final leading = DateTime(month.year, month.month, 1).weekday % 7;
+    final totalCells = ((leading + days + 6) ~/ 7) * 7;
     final byDay = <int, List<CoffeeRecord>>{};
     for (final record in widget.state.records) {
       if (record.date.year == month.year && record.date.month == month.month) {
         byDay.putIfAbsent(record.date.day, () => <CoffeeRecord>[]).add(record);
       }
     }
+
     return Column(
       children: [
         Padding(
@@ -48,30 +50,50 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(children: ['일','월','화','수','목','금','토'].map((d) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(d, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)))))).toList()),
+          child: Row(
+            children: ['일', '월', '화', '수', '목', '금', '토']
+                .map((d) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(d, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, letterSpacing: 0.5, color: ink.withValues(alpha: 0.35))))))
+                .toList(),
+          ),
         ),
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, childAspectRatio: 0.68),
-            itemCount: leading + days,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              crossAxisSpacing: 2,
+              mainAxisSpacing: 2,
+              childAspectRatio: 0.86,
+            ),
+            itemCount: totalCells,
             itemBuilder: (context, index) {
-              if (index < leading) return const SizedBox.shrink();
               final day = index - leading + 1;
+              if (day < 1 || day > days) return const SizedBox.expand();
+
               final records = byDay[day] ?? const <CoffeeRecord>[];
               return InkWell(
                 onTap: records.isEmpty ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen(record: records.first))),
-                child: Container(
-                  decoration: BoxDecoration(border: hairlineBorder(context)),
-                  padding: const EdgeInsets.all(3),
-                  child: Column(
-                    children: [
-                      Align(alignment: Alignment.topLeft, child: Text('$day', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: records.isEmpty ? 0.28 : 0.75)))),
-                      if (records.isNotEmpty)
-                        Expanded(child: Image.asset(recordIllustration(records.first), fit: BoxFit.contain)),
-                      if (records.length > 1) Text('+${records.length - 1}', style: const TextStyle(fontSize: 9)),
-                    ],
-                  ),
+                child: Stack(
+                  children: [
+                    if (records.isNotEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Image.asset(recordIllustration(records.first), fit: BoxFit.contain),
+                        ),
+                      ),
+                    Positioned(
+                      top: 2,
+                      left: 4,
+                      child: Text('$day', style: TextStyle(fontSize: 9, color: ink.withValues(alpha: records.isEmpty ? 0.28 : 0.55))),
+                    ),
+                    if (records.length > 1)
+                      Positioned(
+                        right: 3,
+                        bottom: 2,
+                        child: Text('+${records.length - 1}', style: TextStyle(fontSize: 8, color: ink.withValues(alpha: 0.45))),
+                      ),
+                  ],
                 ),
               );
             },

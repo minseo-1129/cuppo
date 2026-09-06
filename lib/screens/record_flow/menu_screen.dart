@@ -37,7 +37,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     return SelectionTile(
                       label: item.name,
                       selected: selected == item.key,
-                      assetPath: 'assets/ill/hot${item.key}.webp',
+                      assetPath: 'assets/ill/hot${item.key}.png',
                       onTap: () => setState(() => selected = item.key),
                     );
                   },

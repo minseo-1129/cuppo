@@ -6,8 +6,9 @@ import '../widgets/record_card.dart';
 import 'detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, required this.state});
+  const SearchScreen({super.key, required this.state, required this.onBack});
   final AppState state;
+  final VoidCallback onBack;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -30,10 +31,19 @@ class _SearchScreenState extends State<SearchScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-          child: TextField(
-            onChanged: (value) => setState(() => query = value),
-            decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: '제목·메모 검색'),
+          padding: const EdgeInsets.fromLTRB(8, 10, 20, 8),
+          child: Row(
+            children: [
+              IconButton(onPressed: widget.onBack, icon: const Icon(Icons.arrow_back)),
+              const SizedBox(width: 4),
+              Expanded(
+                child: TextField(
+                  autofocus: true,
+                  onChanged: (value) => setState(() => query = value),
+                  decoration: const InputDecoration(hintText: '메뉴 · 제목 · 메모 검색'),
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(

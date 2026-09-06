@@ -104,7 +104,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     return SelectionTile(
                       label: optionLabels[key] ?? key,
                       selected: currentForGroup() == key,
-                      assetPath: 'assets/sel/$key.webp',
+                      assetPath: 'assets/sel/$key.png',
                       onTap: () => select(key),
                     );
                   },

@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
     final rows = <Widget>[
       _SettingsRow(
         title: '다크 모드',
-        trailing: Switch(value: state.darkMode, onChanged: state.toggleDarkMode),
+        trailing: _CuppoToggle(value: state.darkMode, onChanged: state.toggleDarkMode),
       ),
       const _SettingsRow(title: '알림', trailing: Text('준비 중')),
       const _SettingsRow(title: '데이터 백업', trailing: Text('준비 중')),
@@ -45,6 +45,56 @@ class _SettingsRow extends StatelessWidget {
           Expanded(child: Text(title, style: const TextStyle(fontSize: 16))),
           DefaultTextStyle(style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)), child: trailing),
         ],
+      ),
+    );
+  }
+}
+
+class _CuppoToggle extends StatelessWidget {
+  const _CuppoToggle({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = Theme.of(context).colorScheme.onSurface;
+    final accent = Theme.of(context).colorScheme.primary;
+    return Semantics(
+      label: '다크 모드',
+      button: true,
+      toggled: value,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(!value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          width: 46,
+          height: 26,
+          decoration: BoxDecoration(
+            color: value ? accent : ink.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(13),
+          ),
+          child: Stack(
+            children: [
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOut,
+                top: 3,
+                left: value ? 23 : 3,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFFF5F3F0),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -15,9 +15,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int index = 0;
 
   static const pages = [
-    ('assets/ill/hotlatte_wip.webp', '오늘 마신 커피,\n한 장의 카드로', '메뉴를 고르고 온도·우유·시럽까지 그대로 남깁니다.'),
-    ('assets/ill/icemocha_ice.webp', '기록이 쌓여도\n금방 찾을 수 있게', '피드·갤러리·달력에서 다시 보고, 제목과 메모로 검색할 수 있어요.'),
-    ('assets/ill/hotcup_wip.webp', '내 취향대로\n한 잔씩 기록해요', '레시피와 제목·메모를 남기고, 라이트·다크 모드로 편하게 돌아보세요.'),
+    ('assets/ill/hotlatte_wip.png', '오늘 마신 커피,\n한 장의 카드로', '메뉴를 고르고 온도·우유·시럽까지 그대로 남깁니다.'),
+    ('assets/ill/icemocha_ice.png', '기록이 쌓여도\n금방 찾을 수 있게', '피드·갤러리·달력에서 다시 보고, 제목과 메모로 검색할 수 있어요.'),
+    ('assets/ill/hotcup_wip.png', '내 취향대로\n한 잔씩 기록해요', '레시피와 제목·메모를 남기고, 라이트·다크 모드로 편하게 돌아보세요.'),
   ];
 
   @override

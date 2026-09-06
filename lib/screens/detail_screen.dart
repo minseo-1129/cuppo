@@ -78,7 +78,7 @@ class DetailScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(child: Image.asset('assets/sel/${item.$3}.webp', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.coffee_outlined))),
+                          Expanded(child: Image.asset('assets/sel/${item.$3}.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.coffee_outlined))),
                           const SizedBox(height: 4),
                           Text(item.$1, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
                           const SizedBox(height: 2),

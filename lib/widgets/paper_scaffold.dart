@@ -21,7 +21,7 @@ class PaperBackground extends StatelessWidget {
       decoration: BoxDecoration(
         color: dark ? CuppoColors.darkPaper : CuppoColors.lightPaper,
         image: DecorationImage(
-          image: AssetImage(dark ? 'assets/paper_dark.webp' : 'assets/paper.webp'),
+          image: AssetImage(dark ? 'assets/paper_dark.png' : 'assets/paper.png'),
           fit: BoxFit.cover,
         ),
       ),

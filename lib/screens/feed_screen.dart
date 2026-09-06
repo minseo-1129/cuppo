@@ -9,8 +9,9 @@ import 'detail_screen.dart';
 import 'record_flow/menu_screen.dart';
 
 class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key, required this.state});
+  const FeedScreen({super.key, required this.state, required this.onSearch});
   final AppState state;
+  final VoidCallback onSearch;
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
@@ -29,7 +30,7 @@ class _FeedScreenState extends State<FeedScreen> {
         Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -38,6 +39,12 @@ class _FeedScreenState extends State<FeedScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
                     child: Text('${now.year}', style: TextStyle(fontSize: 11, letterSpacing: 1.5, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: '검색',
+                    onPressed: widget.onSearch,
+                    icon: const Icon(Icons.search, size: 21),
                   ),
                 ],
               ),
@@ -122,7 +129,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Opacity(opacity: 0.45, child: Image.asset(Theme.of(context).brightness == Brightness.dark ? 'assets/ring_dark.webp' : 'assets/ring.webp', width: 170)),
+            Opacity(opacity: 0.45, child: Image.asset(Theme.of(context).brightness == Brightness.dark ? 'assets/ring_dark.png' : 'assets/ring.png', width: 170)),
             const SizedBox(height: 24),
             const Text('아직 기록한 커피가 없어요', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 14),
