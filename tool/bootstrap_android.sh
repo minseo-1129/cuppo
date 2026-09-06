@@ -9,20 +9,10 @@ if ! command -v flutter >/dev/null 2>&1; then
   exit 1
 fi
 
-ASSET_ZIP="$ROOT/tool/assets_bundle/assets.zip"
-if [[ ! -f "$ASSET_ZIP" ]]; then
-  echo "tool/assets_bundle/assets.zip 이 없습니다."
+if [[ ! -d "$ROOT/assets" ]]; then
+  echo "assets/ 폴더가 없습니다. CUPPO 런타임 에셋을 repository의 assets/에 추가하세요."
   exit 1
 fi
-
-python3 - <<PYASSETS
-from pathlib import Path
-from zipfile import ZipFile
-root = Path(r"$ROOT")
-bundle = root / "tool" / "assets_bundle" / "assets.zip"
-with ZipFile(bundle) as z:
-    z.extractall(root)
-PYASSETS
 
 flutter create --no-pub --platforms=android --org com.cuppo --project-name coffeejournal "$TMP/coffeejournal"
 rm -rf "$ROOT/android"
