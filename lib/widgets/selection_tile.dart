@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'paper_scaffold.dart';
-
 class SelectionTile extends StatelessWidget {
   const SelectionTile({
     super.key,
