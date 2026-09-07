@@ -23,7 +23,26 @@ class CoffeeRecord {
   final String title;
   final String memo;
   final String time;
+
+  /// Kept only for backwards compatibility with v1 stored records.
+  /// Photo capture is intentionally outside the v2 scope for now.
   final bool photo;
+
+  bool get isIced => temp == 'ice';
+  bool get isHot => !isIced;
+
+  DateTime get recordedAt {
+    final parts = time.split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 0 : 0;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  }
+
+  bool isInMonth(DateTime month) =>
+      date.year == month.year && date.month == month.month;
+
+  String get monthKey =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}';
 
   CoffeeRecord copyWith({
     int? id,
@@ -54,6 +73,7 @@ class CoffeeRecord {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
+        'schema': 2,
         'id': id,
         'date': date.toIso8601String(),
         'menu': menu,
@@ -68,17 +88,27 @@ class CoffeeRecord {
       };
 
   factory CoffeeRecord.fromJson(Map<String, dynamic> json) {
+    final rawDate = json['date'] as String?;
+    final parsedDate = rawDate == null ? null : DateTime.tryParse(rawDate);
+    final rawId = json['id'];
+    final parsedId = rawId is int
+        ? rawId
+        : int.tryParse(rawId?.toString() ?? '') ??
+            DateTime.now().microsecondsSinceEpoch;
+
     return CoffeeRecord(
-      id: json['id'] as int,
-      date: DateTime.parse(json['date'] as String),
-      menu: json['menu'] as String,
-      temp: json['temp'] as String,
-      milk: json['milk'] as String,
-      syrup: json['syrup'] as String,
-      deco: json['deco'] as String,
+      id: parsedId,
+      date: parsedDate == null
+          ? DateTime.now()
+          : DateTime(parsedDate.year, parsedDate.month, parsedDate.day),
+      menu: json['menu'] as String? ?? 'ame',
+      temp: json['temp'] as String? ?? 'hot',
+      milk: json['milk'] as String? ?? 'none',
+      syrup: json['syrup'] as String? ?? 'none',
+      deco: json['deco'] as String? ?? 'none',
       title: json['title'] as String? ?? '',
       memo: json['memo'] as String? ?? '',
-      time: json['time'] as String? ?? '',
+      time: json['time'] as String? ?? '00:00',
       photo: json['photo'] as bool? ?? false,
     );
   }
