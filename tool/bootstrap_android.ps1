@@ -12,11 +12,23 @@ python -c "import pathlib,zipfile; zipfile.ZipFile(pathlib.Path(r'$AssetZip')).e
 
 New-Item -ItemType Directory -Path $Temp | Out-Null
 try {
-  flutter create --no-pub --platforms=android --org com.cuppo --project-name coffeejournal (Join-Path $Temp "coffeejournal")
   $Android = Join-Path $Root "android"
+  $KeyProperties = Join-Path $Android "key.properties"
+  $KeyPropertiesBackup = Join-Path $Temp "key.properties"
+  if (Test-Path $KeyProperties) {
+    Copy-Item $KeyProperties $KeyPropertiesBackup
+  }
+
+  flutter create --no-pub --platforms=android --org com.cuppo --project-name coffeejournal (Join-Path $Temp "coffeejournal")
   if (Test-Path $Android) { Remove-Item -Recurse -Force $Android }
   Copy-Item -Recurse (Join-Path $Temp "coffeejournal\android") $Android
   python (Join-Path $Root "tool\patch_android.py")
+  python (Join-Path $Root "tool\configure_release_signing.py")
+
+  if (Test-Path $KeyPropertiesBackup) {
+    Copy-Item $KeyPropertiesBackup (Join-Path $Android "key.properties")
+  }
+
   Push-Location $Root
   flutter pub get
   Pop-Location
