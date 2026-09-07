@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/menu_catalog.dart';
 import '../models/coffee_record.dart';
 import '../state/app_state.dart';
+import '../widgets/month_picker_sheet.dart';
 import '../widgets/paper_scaffold.dart';
 import '../widgets/record_card.dart';
 import 'detail_screen.dart';
@@ -51,22 +52,14 @@ class _FeedScreenState extends State<FeedScreen> {
                         children: [
                           Text(
                             '${selectedMonth.year}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              letterSpacing: 1.5,
-                              color: ink.withValues(alpha: 0.42),
-                            ),
+                            style: TextStyle(fontSize: 11, letterSpacing: 1.5, color: ink.withValues(alpha: 0.42)),
                           ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 _monthName(selectedMonth.month),
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  letterSpacing: 1.3,
-                                  fontWeight: FontWeight.w300,
-                                ),
+                                style: const TextStyle(fontSize: 22, letterSpacing: 1.3, fontWeight: FontWeight.w300),
                               ),
                               const SizedBox(width: 7),
                               Icon(Icons.arrow_drop_down, size: 18, color: ink.withValues(alpha: 0.42)),
@@ -77,11 +70,7 @@ class _FeedScreenState extends State<FeedScreen> {
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    tooltip: '검색',
-                    onPressed: widget.onSearch,
-                    icon: const Icon(Icons.search, size: 21),
-                  ),
+                  IconButton(tooltip: '검색', onPressed: widget.onSearch, icon: const Icon(Icons.search, size: 21)),
                   IconButton(
                     tooltip: grid ? '리스트 보기' : '그리드 보기',
                     onPressed: () => setState(() => grid = !grid),
@@ -130,46 +119,21 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Future<void> _openMonthPicker() async {
-    final now = DateTime.now();
-    final current = DateTime(now.year, now.month);
-    final months = <DateTime>[current, ...widget.state.recordMonths];
-    final unique = <String, DateTime>{};
-    for (final month in months) {
-      unique['${month.year}-${month.month}'] = month;
-    }
-    final options = unique.values.toList()..sort((a, b) => b.compareTo(a));
-
-    final picked = await showModalBottomSheet<DateTime>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          itemCount: options.length,
-          itemBuilder: (context, index) {
-            final month = options[index];
-            final active = month.year == selectedMonth.year && month.month == selectedMonth.month;
-            final count = widget.state.recordsForMonth(month).length;
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text('${_monthName(month.month)} ${month.year}', style: const TextStyle(letterSpacing: 0.8)),
-              trailing: Text('$count CUPS', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
-              leading: active ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 18) : const SizedBox(width: 18),
-              onTap: () => Navigator.pop(context, month),
-            );
-          },
-        ),
-      ),
+    final picked = await showCuppoMonthPicker(
+      context,
+      initialMonth: selectedMonth,
+      records: widget.state.records,
     );
-
     if (picked != null && mounted) {
       setState(() => selectedMonth = DateTime(picked.year, picked.month));
     }
   }
 
-  void _startAdd() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const MenuScreen()));
+  Future<void> _startAdd() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => const MenuScreen()));
+    if (!mounted) return;
+    final now = DateTime.now();
+    setState(() => selectedMonth = DateTime(now.year, now.month));
   }
 
   void _openDetail(CoffeeRecord record) {
