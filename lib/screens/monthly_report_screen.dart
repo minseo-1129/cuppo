@@ -159,7 +159,7 @@ class _CaffeineBars extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final entry = entries[index];
-                final ratio = (entry.mg / report.dailyGoalMg).clamp(0.04, 1.0);
+                final ratio = (entry.mg / report.dailyGoalMg).clamp(0.04, 1.0).toDouble();
                 final reached = entry.mg >= report.dailyGoalMg;
                 return SizedBox(
                   width: 32,
