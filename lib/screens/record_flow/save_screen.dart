@@ -39,6 +39,8 @@ class _SaveScreenState extends State<SaveScreen> {
   @override
   Widget build(BuildContext context) {
     final menu = menuByKey(widget.menuKey);
+    final ink = Theme.of(context).colorScheme.onSurface;
+
     return PaperScaffold(
       resizeToAvoidBottomInset: true,
       body: Column(
@@ -48,71 +50,93 @@ class _SaveScreenState extends State<SaveScreen> {
             child: Row(
               children: [
                 IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
-                Text('SAVE', style: TextStyle(fontSize: 11, letterSpacing: 1.8, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
+                const Spacer(),
+                Text('STEP 2 / 2', style: TextStyle(fontSize: 11, letterSpacing: 1.8, color: ink.withValues(alpha: 0.40))),
+                const SizedBox(width: 20),
               ],
             ),
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
               children: [
-                SizedBox(height: 170, child: Image.asset(illustrationPath(menu: widget.menuKey, temp: widget.temp, deco: widget.deco), fit: BoxFit.contain)),
-                Text(menu.name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
-                const SizedBox(height: 6),
-                Text(recipeLine(temp: widget.temp, milk: widget.milk, syrup: widget.syrup, deco: widget.deco), textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55))),
-                const SizedBox(height: 28),
-                TextField(
-                  controller: titleController,
-                  style: const TextStyle(fontSize: 20),
-                  decoration: const InputDecoration(hintText: '제목을 입력하세요'),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: memoController,
-                  maxLines: 6,
-                  minLines: 4,
-                  style: const TextStyle(fontSize: 16, height: 1.8),
-                  decoration: const InputDecoration(hintText: '오늘 커피에 대한 메모를 남겨보세요'),
-                ),
-                const SizedBox(height: 18),
-                InkWell(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('사진 기능은 v1.1에서 연결할 예정이에요.')));
-                  },
-                  child: Container(
-                    height: 52,
-                    decoration: BoxDecoration(border: hairlineBorder(context)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: const Row(children: [Icon(Icons.add_a_photo_outlined, size: 20), SizedBox(width: 12), Text('사진 추가')]),
+                Container(
+                  height: 190,
+                  decoration: BoxDecoration(border: hairlineBorder(context)),
+                  padding: const EdgeInsets.fromLTRB(15, 13, 15, 12),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text('#${menu.name}', style: TextStyle(fontSize: 12, color: ink.withValues(alpha: 0.48))),
+                          const Spacer(),
+                          Text(_todayLabel(), style: TextStyle(fontSize: 11, color: ink.withValues(alpha: 0.42))),
+                        ],
+                      ),
+                      Expanded(
+                        child: Image.asset(
+                          illustrationPath(menu: widget.menuKey, temp: widget.temp, deco: widget.deco),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          titleController.text.trim().isEmpty ? '제목 없음' : titleController.text.trim(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 13, color: ink.withValues(alpha: 0.52)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 24),
+                Text('제목', style: TextStyle(fontSize: 12, color: ink.withValues(alpha: 0.42))),
+                TextField(
+                  controller: titleController,
+                  onChanged: (_) => setState(() {}),
+                  style: const TextStyle(fontSize: 16),
+                  decoration: const InputDecoration(hintText: '한 줄로 남기기'),
+                ),
+                const SizedBox(height: 20),
+                Text('메모', style: TextStyle(fontSize: 12, color: ink.withValues(alpha: 0.42))),
+                TextField(
+                  controller: memoController,
+                  maxLines: 4,
+                  minLines: 3,
+                  style: const TextStyle(fontSize: 14, height: 1.7),
+                  decoration: const InputDecoration(hintText: '맛, 장소, 기분'),
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: ink.withValues(alpha: 0.14)),
+                      bottom: BorderSide(color: ink.withValues(alpha: 0.14)),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          recipeLine(temp: widget.temp, milk: widget.milk, syrup: widget.syrup, deco: widget.deco),
+                          style: TextStyle(fontSize: 12, height: 1.5, color: ink.withValues(alpha: 0.48)),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('${menu.caffeine}mg', style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 SizedBox(
-                  height: 48,
+                  height: 52,
                   child: FilledButton(
                     style: FilledButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-                    onPressed: () async {
-                      final inherited = AppStateScope.of(context);
-                      final now = DateTime.now();
-                      final time = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-                      final record = CoffeeRecord(
-                        id: now.microsecondsSinceEpoch,
-                        date: DateTime(now.year, now.month, now.day),
-                        menu: widget.menuKey,
-                        temp: widget.temp,
-                        milk: widget.milk,
-                        syrup: widget.syrup,
-                        deco: widget.deco,
-                        title: titleController.text.trim().isEmpty ? menu.name : titleController.text.trim(),
-                        memo: memoController.text.trim(),
-                        time: time,
-                      );
-                      await inherited.addRecord(record);
-                      if (!context.mounted) return;
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('커피 기록을 저장했어요.')));
-                    },
-                    child: const Text('기록 저장'),
+                    onPressed: _save,
+                    child: const Text('저장'),
                   ),
                 ),
               ],
@@ -121,5 +145,33 @@ class _SaveScreenState extends State<SaveScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _save() async {
+    final inherited = AppStateScope.of(context);
+    final now = DateTime.now();
+    final menu = menuByKey(widget.menuKey);
+    final time = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final record = CoffeeRecord(
+      id: now.microsecondsSinceEpoch,
+      date: DateTime(now.year, now.month, now.day),
+      menu: widget.menuKey,
+      temp: widget.temp,
+      milk: widget.milk,
+      syrup: widget.syrup,
+      deco: widget.deco,
+      title: titleController.text.trim().isEmpty ? menu.name : titleController.text.trim(),
+      memo: memoController.text.trim(),
+      time: time,
+    );
+    await inherited.addRecord(record);
+    if (!mounted) return;
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('커피 기록을 저장했어요.')));
+  }
+
+  String _todayLabel() {
+    final now = DateTime.now();
+    return '${now.year}.${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
   }
 }
