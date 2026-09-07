@@ -14,10 +14,21 @@ if [[ ! -d "$ROOT/assets" ]]; then
   exit 1
 fi
 
+KEY_PROPERTIES_BACKUP="$TMP/key.properties"
+if [[ -f "$ROOT/android/key.properties" ]]; then
+  cp "$ROOT/android/key.properties" "$KEY_PROPERTIES_BACKUP"
+fi
+
 flutter create --no-pub --platforms=android --org com.cuppo --project-name coffeejournal "$TMP/coffeejournal"
 rm -rf "$ROOT/android"
 cp -R "$TMP/coffeejournal/android" "$ROOT/android"
 python3 "$ROOT/tool/patch_android.py"
+python3 "$ROOT/tool/configure_release_signing.py"
+
+if [[ -f "$KEY_PROPERTIES_BACKUP" ]]; then
+  cp "$KEY_PROPERTIES_BACKUP" "$ROOT/android/key.properties"
+fi
+
 cd "$ROOT"
 flutter pub get
 
