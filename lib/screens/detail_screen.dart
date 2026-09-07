@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/menu_catalog.dart';
 import '../models/coffee_record.dart';
 import '../state/app_state_scope.dart';
+import '../widgets/cuppo_sheets.dart';
 import '../widgets/paper_scaffold.dart';
 import '../widgets/record_card.dart';
 import 'share_card_screen.dart';
@@ -31,14 +32,10 @@ class DetailScreen extends StatelessWidget {
               children: [
                 IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
                 const Spacer(),
-                PopupMenuButton<String>(
+                IconButton(
+                  tooltip: '더보기',
+                  onPressed: () => _openActions(context),
                   icon: const Icon(Icons.more_horiz),
-                  onSelected: (value) {
-                    if (value == 'delete') _delete(context);
-                  },
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'delete', child: Text('기록 삭제')),
-                  ],
                 ),
               ],
             ),
@@ -124,10 +121,7 @@ class DetailScreen extends StatelessWidget {
                   height: 50,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => ShareCardScreen(record: record)),
-                    ),
+                    onPressed: () => _openShare(context),
                     child: const Text('카드 이미지로 저장'),
                   ),
                 ),
@@ -139,20 +133,91 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _delete(BuildContext context) async {
-    final delete = await showDialog<bool>(
+  void _openShare(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ShareCardScreen(record: record)),
+    );
+  }
+
+  Future<void> _openActions(BuildContext context) async {
+    final action = await showCuppoSheet<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        title: const Text('기록을 삭제할까요?'),
-        content: const Text('삭제한 기록은 되돌릴 수 없습니다.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('취소')),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('삭제')),
-        ],
+      child: Builder(
+        builder: (sheetContext) {
+          final ink = Theme.of(sheetContext).colorScheme.onSurface;
+          final accent = Theme.of(sheetContext).colorScheme.primary;
+
+          Widget row({required String label, required String value, Color? color}) {
+            return InkWell(
+              onTap: () => Navigator.pop(sheetContext, value),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 2),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: ink.withValues(alpha: 0.12))),
+                ),
+                child: Text(label, style: TextStyle(fontSize: 16, color: color ?? ink)),
+              ),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 38,
+                  height: 3,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: ink.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                row(label: '카드 이미지로 저장', value: 'share'),
+                row(label: '기록 삭제', value: 'delete', color: accent),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      side: BorderSide(color: ink.withValues(alpha: 0.20)),
+                      foregroundColor: ink,
+                    ),
+                    onPressed: () => Navigator.pop(sheetContext),
+                    child: const Text('취소', style: TextStyle(fontSize: 14)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
-    if (delete == true && context.mounted) {
+
+    if (!context.mounted) return;
+    if (action == 'share') {
+      _openShare(context);
+    } else if (action == 'delete') {
+      await _delete(context);
+    }
+  }
+
+  Future<void> _delete(BuildContext context) async {
+    final delete = await showCuppoConfirmSheet(
+      context: context,
+      title: '이 기록을 삭제할까요?',
+      message: '삭제한 기록은 되돌릴 수 없습니다.',
+      confirmLabel: '기록 삭제',
+      cancelLabel: '취소',
+      destructive: true,
+    );
+
+    if (delete && context.mounted) {
       await AppStateScope.of(context).deleteRecord(record.id);
       if (context.mounted) Navigator.pop(context);
     }
