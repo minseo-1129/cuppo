@@ -23,10 +23,15 @@ class CuppoApp extends StatelessWidget {
     final ink = dark ? CuppoColors.darkInk : CuppoColors.lightInk;
     final paper = dark ? CuppoColors.darkPaper : CuppoColors.lightPaper;
     final accent = dark ? CuppoColors.darkAccent : CuppoColors.lightAccent;
+    final quietInteraction = accent.withValues(alpha: dark ? 0.10 : 0.07);
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       scaffoldBackgroundColor: Colors.transparent,
+      hoverColor: quietInteraction,
+      focusColor: quietInteraction,
+      splashColor: accent.withValues(alpha: dark ? 0.14 : 0.10),
       colorScheme: ColorScheme.fromSeed(
         seedColor: accent,
         brightness: brightness,
@@ -34,15 +39,41 @@ class CuppoApp extends StatelessWidget {
         surface: paper,
         onSurface: ink,
       ),
-      textTheme: ThemeData(brightness: brightness).textTheme.apply(bodyColor: ink, displayColor: ink),
+      textTheme: ThemeData(brightness: brightness)
+          .textTheme
+          .apply(bodyColor: ink, displayColor: ink),
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
-        border: UnderlineInputBorder(borderSide: BorderSide(color: ink.withValues(alpha: 0.20))),
-        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: ink.withValues(alpha: 0.20))),
-        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: accent)),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(color: ink.withValues(alpha: 0.20)),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: ink.withValues(alpha: 0.20)),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: accent),
+        ),
         hintStyle: TextStyle(color: ink.withValues(alpha: 0.35)),
       ),
-      snackBarTheme: SnackBarThemeData(backgroundColor: ink, contentTextStyle: TextStyle(color: paper)),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: accent,
+        foregroundColor: paper,
+        elevation: 2,
+        focusElevation: 2,
+        hoverElevation: 3,
+        highlightElevation: 2,
+        shape: const CircleBorder(),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: paper,
+        modalBackgroundColor: paper,
+        surfaceTintColor: Colors.transparent,
+        dragHandleColor: ink.withValues(alpha: 0.58),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: ink,
+        contentTextStyle: TextStyle(color: paper),
+      ),
     );
   }
 
@@ -59,7 +90,9 @@ class CuppoApp extends StatelessWidget {
             theme: _theme(Brightness.light),
             darkTheme: _theme(Brightness.dark),
             themeMode: state.darkMode ? ThemeMode.dark : ThemeMode.light,
-            home: state.onboardingComplete ? HomeShell(state: state) : OnboardingScreen(state: state),
+            home: state.onboardingComplete
+                ? HomeShell(state: state)
+                : OnboardingScreen(state: state),
           ),
         );
       },
