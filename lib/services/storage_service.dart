@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/coffee_record.dart';
 
 class StorageService {
+  // Keep the original key so existing Play users retain all v1 records.
   static const _recordsKey = 'cuppo.records.v1';
   static const _onboardingKey = 'cuppo.onboarding.complete';
   static const _darkModeKey = 'cuppo.darkMode';
@@ -16,9 +17,10 @@ class StorageService {
     try {
       final decoded = jsonDecode(raw) as List<dynamic>;
       return decoded
-          .map((item) => CoffeeRecord.fromJson(item as Map<String, dynamic>))
+          .whereType<Map<String, dynamic>>()
+          .map(CoffeeRecord.fromJson)
           .toList()
-        ..sort((a, b) => b.date.compareTo(a.date));
+        ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
     } catch (_) {
       return <CoffeeRecord>[];
     }
