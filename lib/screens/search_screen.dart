@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../data/menu_catalog.dart';
 import '../models/coffee_record.dart';
 import '../state/app_state.dart';
-import '../widgets/record_card.dart';
 import 'detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
