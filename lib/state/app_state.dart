@@ -1,11 +1,15 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/coffee_record.dart';
+import '../models/monthly_report.dart';
+import '../services/analytics_service.dart';
 import '../services/storage_service.dart';
 
 class AppState extends ChangeNotifier {
   AppState(this._storage);
+
   final StorageService _storage;
+  final AnalyticsService _analytics = const AnalyticsService();
 
   bool isReady = false;
   bool onboardingComplete = false;
@@ -16,8 +20,18 @@ class AppState extends ChangeNotifier {
     records = await _storage.loadRecords();
     onboardingComplete = await _storage.loadOnboardingComplete();
     darkMode = await _storage.loadDarkMode();
+    _sortRecords();
     isReady = true;
     notifyListeners();
+  }
+
+  List<CoffeeRecord> recordsForMonth(DateTime month) {
+    return records.where((record) => record.isInMonth(month)).toList()
+      ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
+  }
+
+  MonthlyReport reportForMonth(DateTime month, {int dailyGoalMg = 400}) {
+    return _analytics.buildMonthlyReport(records, month, dailyGoalMg: dailyGoalMg);
   }
 
   Future<void> completeOnboarding() async {
@@ -33,12 +47,8 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> addRecord(CoffeeRecord record) async {
-    records = <CoffeeRecord>[record, ...records]
-      ..sort((a, b) {
-        final dateOrder = b.date.compareTo(a.date);
-        if (dateOrder != 0) return dateOrder;
-        return b.id.compareTo(a.id);
-      });
+    records = <CoffeeRecord>[record, ...records];
+    _sortRecords();
     notifyListeners();
     await _storage.saveRecords(records);
   }
@@ -47,5 +57,13 @@ class AppState extends ChangeNotifier {
     records = records.where((record) => record.id != id).toList();
     notifyListeners();
     await _storage.saveRecords(records);
+  }
+
+  void _sortRecords() {
+    records.sort((a, b) {
+      final timeOrder = b.recordedAt.compareTo(a.recordedAt);
+      if (timeOrder != 0) return timeOrder;
+      return b.id.compareTo(a.id);
+    });
   }
 }
