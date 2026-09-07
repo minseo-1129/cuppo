@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.3.2
+  gal: ^2.3.3
+  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:
