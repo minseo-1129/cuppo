@@ -30,6 +30,23 @@ class AppState extends ChangeNotifier {
       ..sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
   }
 
+  List<DateTime> get recordMonths {
+    final months = <String, DateTime>{};
+    for (final record in records) {
+      final month = DateTime(record.date.year, record.date.month);
+      months['${month.year}-${month.month}'] = month;
+    }
+    final values = months.values.toList()..sort((a, b) => b.compareTo(a));
+    return values;
+  }
+
+  CoffeeRecord? recordById(int id) {
+    for (final record in records) {
+      if (record.id == id) return record;
+    }
+    return null;
+  }
+
   MonthlyReport reportForMonth(DateTime month, {int dailyGoalMg = 400}) {
     return _analytics.buildMonthlyReport(records, month, dailyGoalMg: dailyGoalMg);
   }
